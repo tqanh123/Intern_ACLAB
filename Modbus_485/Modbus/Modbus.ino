@@ -3,10 +3,12 @@
 #include "RelayStatus.h"
 
 #define IO_USERNAME "tqanh"
-#define IO_KEY "aio_vSqY75rAh6R5OaUKoMK5NqShscQi"
+#define IO_KEY "aio_CJBZ53SOYTagic066QfNML2nR13t"
 
-#define WIFI_SSID "HoBa Home CN6_L3_5G "
-#define WIFI_PASS "0338440977"
+// #define WIFI_SSID "HoBa Home CN6_L3_5G "
+// #define WIFI_PASS "0338440977"
+#define WIFI_SSID "ACLAB"
+#define WIFI_PASS "ACLAB2023"
 
 #define RS485 Serial2
 #define LED_PIN 2
@@ -65,11 +67,19 @@ void loop()
   io.run();
 }
 
-void OnOffRelay(void *pvParameters) {
+void TaskOnOffRelay(void *pvParameters) {
   while(1) {
     Serial.println("On Off Relay task running.");
 
+    for (int i = 0; i < 32; i++) {
+      Serial.println("Relay " + String(i) + " turned ON");
+      sendModbusCommand(relay_ON[i], sizeof(relay_ON[0]));
+    }
 
+    for (int i = 0; i < 32; i++) {
+      Serial.println("Relay " + String(i) + " turned OFF");
+      sendModbusCommand(relay_OFF[i], sizeof(relay_OFF[0]));
+    }
 
     delay(5000);
   }
@@ -103,12 +113,12 @@ void handleMessage(AdafruitIO_Data *data)
     // Send the Modbus command for the specific relay
     if (statusStr == "ON" && index < (sizeof(relay_ON) / sizeof(relay_ON[0])))
     {
-      // sendModbusCommand(relay_ON[index], sizeof(relay_ON[0]));
+      sendModbusCommand(relay_ON[index], sizeof(relay_ON[0]));
       Serial.println("Relay " + String(index) + " turned ON");
     }
     else if (statusStr == "OFF" && index < (sizeof(relay_OFF) / sizeof(relay_OFF[0])))
     {
-      // sendModbusCommand(relay_OFF[index], sizeof(relay_OFF[0]));
+      sendModbusCommand(relay_OFF[index], sizeof(relay_OFF[0]));
       Serial.println("Relay " + String(index) + " turned OFF");
     }
     else
